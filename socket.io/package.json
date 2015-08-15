@@ -1,0 +1,26 @@
+{
+  "name": "testing",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "bcrypt": "*",
+    "body-parser": "~1.12.0",
+    "connect-flash": "*",
+    "cookie-parser": "~1.3.4",
+    "debug": "~2.1.1",
+    "express": "~4.12.2",
+    "express-session": "*",
+    "express-validator": "*",
+    "morgan": "~1.5.1",
+    "multer": "*",
+    "nunjucks": "*",
+    "passport": "*",
+    "passport-local": "*",
+    "sequelize": "*",
+    "serve-favicon": "~2.2.0",
+    "socket.io": "^1.3.6"
+  }
+}

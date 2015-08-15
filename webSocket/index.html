@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+<body class="container">
+<div></div>
+<div class="row " style="padding-top:40px;">
+    <h3 class="text-center">CHAT APP </h3>
+    <br/><br/>
+
+    <div class="col-md-8 col-sx-8" id="inputName">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                INPUT YOUR CHAT NAME
+            </div>
+            <div class="panel-footer">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter your name" id="username"/>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-info" type="button" onclick="joinChatRoom()">JOIN
+                                        </button>
+                                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8" id="chatbox">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                CHAT ROOM
+            </div>
+            <div class="panel-body">
+                <ul class="media-list" style="height:500px; overflow-y: scroll" id="chatbox-listMessages">
+
+                </ul>
+            </div>
+            <div class="panel-footer">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter message" id="userMessage"/>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-info" type="button" onclick="sendMessage()">SEND</button>
+                                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sx-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                ONLINE USERS
+            </div>
+            <div class="panel-body">
+                <ul class="media-list" id="userbox">
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+<script>
+    var conn = new WebSocket("ws://localhost:3333", ['json', 'xml']);
+    var username = "";
+
+    $(function () {
+        $('#chatbox').hide();
+    });
+
+    var joinChatRoom = function () {
+        username = $('#username').val();
+        if (!username.match(/\w+/)) {
+            $('#username').focus();
+        } else {
+            conn.send(JSON.stringify({type: 'newUser', username: username}));
+            $('#inputName').hide();
+            $('#chatbox').show();
+        }
+    };
+    var userMessage = function (name, text) {
+        return (' <li class="media"> <div class="media-body"> <div class="media"> <div class="media-body" >' +
+        '<b>' + name + '</b> : ' + text +
+        '<hr /> </div> </div> </div> </li>'
+        )
+    };
+
+    var userItem = function (username) {
+        return (' <li class="media"> <div class="media-body"> <div class="media"> <div class="media-body">' +
+        '<a><h5>' + username + '</h5></a>' +
+        '</div> </div> </div> </li>')
+    };
+
+    var sendMessage = function () {
+        var userMessage = $('#userMessage').val();
+        conn.send(JSON.stringify({type: 'userMessage', message: userMessage , username: username}));
+        $('#userMessage').val("");
+    };
+
+    conn.onerror = function (error) {
+        $("#chatbox-listMessages").append(userMessage('system', error));
+    };
+    conn.onclose = function () {
+        $("#chatbox-listMessages").append(userMessage('system', "Server has closed the connection!"));
+    };
+    conn.onmessage = function (message) {
+        var msg = JSON.parse(message.data);
+        if (msg.type === 'newUser') {
+            $("#chatbox-listMessages").append(userMessage('system', msg.username + ' connected'));
+            $('#userbox').append(userItem(msg.username));
+        } else if (msg.type === 'userMessage') {
+            $("#chatbox-listMessages").append(userMessage(msg.username, msg.message));
+        } else if (msg.type === 'updateUser') {
+            var users = JSON.parse(msg.users);
+            $('#userbox').html('');
+            for( var key in users) {
+                $('#userbox').append(userItem(users[key]));
+            }
+        }
+
+    };
+
+</script>
+</html>

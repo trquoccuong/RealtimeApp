@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-3">
+            <table class="table">
+                <tr>
+                    <td>Name</td>
+                    <td id="name"></td>
+                </tr>
+                <tr>
+                    <td>Rate</td>
+                    <td id="rate"></td>
+                </tr>
+                <tr>
+                    <td>Bid</td>
+                    <td id="bid"></td>
+                </tr>
+                <tr>
+                    <td>Ask</td>
+                    <td id="ask"></td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            Currency: <input type="text" id="input-symbol" style="width: 100%;"/>
+        </div>
+
+    </div>
+</div>
+</body>
+<script>
+    var getData = function () {
+        var symbol = $("#input-symbol").val();
+        $.get("/finance?symbol=" + symbol, function (data) {
+            var receiveData = JSON.parse(data);
+            $('#name').html(receiveData.query.results.rate.Name);
+
+            if (parseFloat($('#rate').html()) > receiveData.query.results.rate.Rate) {
+                $('#rate').css('background', 'red');
+            } else {
+                $('#rate').css('background', 'green');
+            }
+
+            $('#rate').html(receiveData.query.results.rate.Rate);
+            $('#bid').html(receiveData.query.results.rate.Bid);
+            $('#ask').html(receiveData.query.results.rate.Ask);
+            setTimeout(getData, 1000);
+        });
+    };
+    getData();
+</script>
+</html>

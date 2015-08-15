@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <br/><br/>
+    <div class="col-md-8" id="chatbox">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                CHAT ROOM
+            </div>
+            <div class="panel-body">
+                <ul class="media-list" style="height:500px; overflow-y: scroll" id="chatbox-listMessages">
+
+                </ul>
+            </div>
+            <div class="panel-footer">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter message" id="userMessage"/>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary" type="button" onclick="sendMessage()">SEND</button>
+                                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sx-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                ONLINE USERS
+            </div>
+            <div class="panel-body">
+                <ul class="media-list" id="userbox">
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block jsExtends %}
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://localhost:3000');
+
+        var userMessage = function (name, text) {
+            return (' <li class="media"> <div class="media-body"> <div class="media"> <div class="media-body" >' +
+            '<b>' + name + '</b> : ' + text +
+            '<hr /> </div> </div> </div> </li>'
+            )
+        };
+
+        var userItem = function (username) {
+            return (' <li class="media"> <div class="media-body"> <div class="media"> <div class="media-body">' +
+            '<a><h5>' + username + '</h5></a>' +
+            '</div> </div> </div> </li>')
+        };
+
+        socket.on('welcome', function (data) {
+            console.log(data);
+            socket.emit('login', { my: 'data' });
+        });
+    </script>
+{% endblock %}
