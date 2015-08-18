@@ -11,6 +11,7 @@ var nunjucks = require('nunjucks');
 var flash = require('connect-flash');
 var Sequelize = require('sequelize');
 
+
 global.db = new Sequelize('postgres://postgres:@localhost:5432/quoccuong');
 
 db['user'] = db.import(__dirname + '/models/user.js');
@@ -34,7 +35,7 @@ app.set('view engine', 'html');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser('techmaster'));
+app.use(cookieParser('secret'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 

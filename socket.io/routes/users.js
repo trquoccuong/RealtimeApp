@@ -7,12 +7,15 @@ var LocalStrategy = require('passport-local').Strategy;
 var passport = require('passport');
 var bcrypt = require('bcrypt');
 
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
+passport.serializeUser(function (user, done) {
+    done(null, {
+        id: user.id,
+        name: user.name
+    });
 });
 
-passport.deserializeUser(function(id, done) {
-    db.user.findById(id).then(function (user) {
+passport.deserializeUser(function (data, done) {
+    db.user.findById(data.id).then(function (user) {
         done(null, user);
     }).catch(function (err) {
         console.log(err);
@@ -20,14 +23,18 @@ passport.deserializeUser(function(id, done) {
 });
 
 passport.use(new LocalStrategy(
-    function (username,password,done) {
-        db.user.find({where : {
-            username : username
-        }}).then(function (user) {
-            bcrypt.compare(password, user.password, function (err,result) {
-                if (err) { return done(err); }
-                if(!result) {
-                    return done(null, false, { message: 'Incorrect username and password' });
+    function (username, password, done) {
+        db.user.find({
+            where: {
+                username: username
+            }
+        }).then(function (user) {
+            bcrypt.compare(password, user.password, function (err, result) {
+                if (err) {
+                    return done(err);
+                }
+                if (!result) {
+                    return done(null, false, {message: 'Incorrect username and password'});
                 }
                 return done(null, user);
             })
@@ -82,11 +89,11 @@ router.route('/register')
             )
         } else {
             db.user.find({
-                where : {
-                    username : username
+                where: {
+                    username: username
                 }
             }).then(function (result) {
-                if(result) {
+                if (result) {
                     req.flash('danger', 'Username already exists');
                     return res.render('register', {
                             name: name,
@@ -118,20 +125,23 @@ router.route('/login')
     .get(function (req, res) {
         var count = req.signedCookies.count || 0;
         count++;
-        res.cookie('count',count, {signed : true});
+        res.cookie('count', count, {signed: true});
         res.render('login', {
             'title': 'Log in'
         })
     })
-    .post(passport.authenticate('local', { failureRedirect: '/users/login',failureFlash: 'Invalid username and password' }), function (req, res) {
+    .post(passport.authenticate('local', {
+        failureRedirect: '/users/login',
+        failureFlash: 'Invalid username and password'
+    }), function (req, res) {
         console.log('Authentication successful');
-        req.flash('success','You are logged in');
+        req.flash('success', 'You are logged in');
         res.redirect('/')
     })
 
-router.get('/logout', function (req,res) {
+router.get('/logout', function (req, res) {
     req.logout();
-    req.flash('success','You logged out');
+    req.flash('success', 'You logged out');
     res.redirect('/users/login');
 })
 

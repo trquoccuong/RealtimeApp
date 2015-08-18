@@ -52,10 +52,19 @@
             '<a><h5>' + username + '</h5></a>' +
             '</div> </div> </div> </li>')
         };
+        var sendMessage = function () {
+            var userMessage = $('#userMessage').val();
+            socket.emit('userMessage', {message: userMessage});
+            $('#userMessage').val("");
+        };
 
+        socket.on('userMessage', function (data) {
+            console.log(data);
+            $("#chatbox-listMessages").append(userMessage(data.username, data.message));
+        });
         socket.on('welcome', function (data) {
             console.log(data);
             socket.emit('login', { my: 'data' });
-        });
+        })
     </script>
 {% endblock %}
