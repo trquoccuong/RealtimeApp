@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+    <script>
+        var ev = new EventSource('/login');
+        ev.addEventListener("message", function(broadcast) {
+            document.getElementById("clock").innerHTML = broadcast.data;
+        });
+        </script>
 </head>
 <body>
 <div id="clock"></div>
 </body>
-<script>
-    var source = new EventSource('/time');
-    source.addEventListener('message', function(e) {
-        console.log(e.data);
-    });
 
-</script>
 </html>

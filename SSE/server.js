@@ -2,14 +2,13 @@
 
 var express = require('express');
 var app = express();
-var http = require('http');
 
 app.get('/', function (req,res) {
-   res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/time', function (req,res) {
-    console.log(typeof res, req instanceof http.OutgoingMessage);
+    console.log(typeof res, res.prototype.isPrototypeOf('OutgoingMessage'));
     res.writeHead(200,{
         "Content-Type" : "text/event-stream",
         "Cache-Control" : "no-cache",
@@ -28,4 +27,4 @@ app.get('/time', function (req,res) {
 });
 
 
-app.listen(3000);
+app.listen(80);
